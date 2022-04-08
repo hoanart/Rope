@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class RopePhysics : MonoBehaviour {
     [Header("Anchor")]
@@ -27,7 +24,7 @@ public class RopePhysics : MonoBehaviour {
     //A list of all segment; 
     [SerializeField]
     public List<Segment> segments = new List<Segment>();
-
+    private Vector3[] vertices;
 
     // Start is called before the first frame update
     void Start()
@@ -76,7 +73,7 @@ public class RopePhysics : MonoBehaviour {
     {
         //Define gravity and deltaTime.
         Vector3 gravity = new Vector3(0, -9.81f, 0);
-        float deltaTime = Time.fixedDeltaTime;
+        float deltaTime = Time.deltaTime;
 
         //Set start constraint.
         var startSegment = segments[0];
@@ -90,7 +87,7 @@ public class RopePhysics : MonoBehaviour {
             Vector3 velocity = segments[i].pos - segments[i].prevPos;
             currentPos.prevPos = segments[i].pos;
             //use velocity-Verlet.
-            Vector3 newVelocity = velocity + 0.5f * gravity * deltaTime;
+            Vector3 newVelocity = velocity + 0.5f * gravity * deltaTime*deltaTime;
             currentPos.pos += newVelocity;
             segments[i] = currentPos;
         }
@@ -139,7 +136,11 @@ public class RopePhysics : MonoBehaviour {
     /// </summary>
     private void DrawRope()
     {
-        Vector3[] vertices = new Vector3[segments.Count];
+        if (vertices == null || vertices.Length != segments.Count)
+        {
+            vertices = new Vector3[segments.Count];
+        }
+        
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = segments[i].pos;
